@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}{% if object %}Edit{% else %}Create{% endif %} Budget | FinAI Tracker{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4" style="max-width: 600px; margin: 0 auto;">
+    <div class="mb-4">
+        <h1 class="h2 mb-0">{% if object %}Edit{% else %}Create{% endif %} Budget</h1>
+        <p class="text-secondary">Specify limits on a category to control spending velocity.</p>
+    </div>
+
+    <div class="glass-card p-4">
+        <form method="post">
+            {% csrf_token %}
+            {% if form.errors %}
+                <div class="alert alert-danger border-0 glass-card text-white mb-3">
+                    <ul class="mb-0">
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <div class="mb-3">
+                <label for="id_category" class="form-label text-secondary">Expense Category</label>
+                {{ form.category }}
+            </div>
+            <div class="mb-3">
+                <label for="id_amount" class="form-label text-secondary">Budget Limit ({{ request.user.currency }})</label>
+                {{ form.amount }}
+            </div>
+            <div class="mb-3">
+                <label for="id_start_date" class="form-label text-secondary">Start Date</label>
+                {{ form.start_date }}
+            </div>
+            <div class="mb-4">
+                <label for="id_end_date" class="form-label text-secondary">End Date</label>
+                {{ form.end_date }}
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'budget_list' %}" class="btn btn-outline-light">
+                    Cancel
+                </a>
+                <button type="submit" class="btn btn-primary-custom">
+                    {% if object %}Save Changes{% else %}Create Budget{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

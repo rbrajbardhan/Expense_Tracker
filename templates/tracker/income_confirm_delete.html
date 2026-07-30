@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Delete Income | FinAI Tracker{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4" style="max-width: 600px; margin: 0 auto;">
+    <div class="glass-card p-5 text-center text-white">
+        <i class="bi bi-exclamation-triangle text-danger display-1 mb-4"></i>
+        <h2 class="fw-bold mb-3">Delete Transaction?</h2>
+        <p class="text-secondary mb-4">Are you sure you want to delete the income transaction of <strong>{{ request.user.currency }} {{ object.amount }}</strong> on <strong>{{ object.date }}</strong>?</p>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="d-flex justify-content-center gap-3">
+                <a href="{% url 'income_list' %}" class="btn btn-outline-light px-4">Cancel</a>
+                <button type="submit" class="btn btn-danger px-4">Confirm Delete</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
