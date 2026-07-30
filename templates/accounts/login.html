@@ -1,0 +1,395 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | FinAI Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+            background: #f0f4f8;
+        }
+
+        /* ── LEFT PANEL ── */
+        .auth-left {
+            width: 52%;
+            background: linear-gradient(145deg, #0f172a 0%, #1e3a5f 50%, #0f2d4a 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* decorative blobs */
+        .auth-left::before {
+            content: '';
+            position: absolute;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(99,102,241,0.18) 0%, transparent 70%);
+            top: -100px; left: -100px;
+            border-radius: 50%;
+        }
+        .auth-left::after {
+            content: '';
+            position: absolute;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(16,185,129,0.14) 0%, transparent 70%);
+            bottom: -80px; right: -80px;
+            border-radius: 50%;
+        }
+
+        .left-content { position: relative; z-index: 2; }
+
+        .brand-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 50px;
+            padding: 8px 20px;
+            margin-bottom: 2.5rem;
+        }
+        .brand-badge span {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+        }
+        .brand-badge i { color: #6366f1; font-size: 1.2rem; }
+
+        .left-headline {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1.2;
+            margin-bottom: 1.2rem;
+        }
+        .left-headline span { color: #6ee7b7; }
+
+        .left-sub {
+            color: rgba(255,255,255,0.65);
+            font-size: 1.05rem;
+            line-height: 1.7;
+            margin-bottom: 3rem;
+            max-width: 440px;
+        }
+
+        /* Stats row */
+        .stats-row {
+            display: flex;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+            margin-bottom: 2.5rem;
+        }
+        .stat-pill {
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 14px;
+            padding: 1rem 1.4rem;
+            flex: 1;
+            min-width: 130px;
+        }
+        .stat-pill .pill-num {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+        .stat-pill .pill-label {
+            font-size: 0.78rem;
+            color: rgba(255,255,255,0.5);
+            margin-top: 2px;
+        }
+
+        /* Quote card */
+        .quote-card {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 1.4rem 1.6rem;
+        }
+        .quote-card p {
+            color: rgba(255,255,255,0.85);
+            font-size: 0.92rem;
+            line-height: 1.6;
+            font-style: italic;
+            margin: 0;
+        }
+        .quote-card .quote-author {
+            color: #6ee7b7;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 0.6rem;
+            font-style: normal;
+        }
+
+        /* ── RIGHT PANEL ── */
+        .auth-right {
+            width: 48%;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            overflow-y: auto;
+        }
+
+        .form-box {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .form-header { margin-bottom: 2.2rem; }
+        .form-header .form-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.4rem;
+        }
+        .form-header .form-sub { color: #64748b; font-size: 0.95rem; }
+
+        .input-group-custom { margin-bottom: 1.2rem; }
+        .input-group-custom label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.45rem;
+        }
+
+        .input-wrap {
+            position: relative;
+        }
+        .input-wrap i.input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 1rem;
+            pointer-events: none;
+        }
+        .input-wrap input {
+            width: 100%;
+            padding: 0.72rem 1rem 0.72rem 2.6rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            color: #0f172a;
+            background: #f8fafc;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+        }
+        .input-wrap input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+            background: #ffffff;
+        }
+        .input-wrap input::placeholder { color: #b0bec5; }
+
+        .toggle-pw {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #94a3b8;
+            font-size: 1rem;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        .toggle-pw:hover { color: #475569; }
+
+        .btn-signin {
+            width: 100%;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 10px;
+            background: #0f172a;
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.15s;
+            margin-top: 0.5rem;
+        }
+        .btn-signin:hover {
+            background: #1e293b;
+            transform: translateY(-1px);
+        }
+        .btn-signin:active { transform: translateY(0); }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 1.4rem 0;
+            color: #94a3b8;
+            font-size: 0.82rem;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e2e8f0;
+        }
+
+        .footer-link {
+            text-align: center;
+            margin-top: 1.4rem;
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+        .footer-link a {
+            color: #6366f1;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .footer-link a:hover { text-decoration: underline; }
+
+        .alert-auth {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 10px;
+            padding: 0.8rem 1rem;
+            color: #b91c1c;
+            font-size: 0.88rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 1.2rem;
+        }
+
+        @media (max-width: 860px) {
+            body { flex-direction: column; height: auto; overflow: auto; }
+            .auth-left { width: 100%; padding: 3rem 2rem; min-height: 340px; }
+            .auth-right { width: 100%; padding: 2.5rem 1.5rem; }
+            .left-headline { font-size: 2rem; }
+            .stats-row { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LEFT PANEL -->
+    <div class="auth-left">
+        <div class="left-content">
+            <div class="brand-badge">
+                <i class="bi bi-cpu-fill"></i>
+                <span>FinAI Tracker</span>
+            </div>
+
+            <h1 class="left-headline">
+                Track Smarter.<br>
+                Save <span>Better.</span>
+            </h1>
+            <p class="left-sub">
+                Manage your income, track expenses, and let AI-powered insights guide your financial decisions — all in one place.
+            </p>
+
+            <div class="stats-row">
+                <div class="stat-pill">
+                    <div class="pill-num">₹12K+</div>
+                    <div class="pill-label">Avg. monthly tracked</div>
+                </div>
+                <div class="stat-pill">
+                    <div class="pill-num">94%</div>
+                    <div class="pill-label">Budget accuracy</div>
+                </div>
+                <div class="stat-pill">
+                    <div class="pill-num">AI</div>
+                    <div class="pill-label">Forecasting engine</div>
+                </div>
+            </div>
+
+            <div class="quote-card">
+                <p>"AI insights suggested optimizing entertainment spend — saved 15% last month without feeling the pinch."</p>
+                <div class="quote-author">— AI Recommendation Engine</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="auth-right">
+        <div class="form-box">
+            <div class="form-header">
+                <h2 class="form-title">Welcome back</h2>
+                <p class="form-sub">Sign in to access your financial dashboard.</p>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    {% if message.tags == 'error' %}
+                        <div class="alert-auth">
+                            <i class="bi bi-exclamation-circle-fill"></i>
+                            {{ message }}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+
+                <div class="input-group-custom">
+                    <label for="id_username">Username</label>
+                    <div class="input-wrap">
+                        <i class="bi bi-person input-icon"></i>
+                        <input type="text" name="username" id="id_username" placeholder="Enter your username" required autofocus>
+                    </div>
+                </div>
+
+                <div class="input-group-custom">
+                    <label for="id_password">Password</label>
+                    <div class="input-wrap">
+                        <i class="bi bi-lock input-icon"></i>
+                        <input type="password" name="password" id="id_password" placeholder="Enter your password" required>
+                        <button type="button" class="toggle-pw" onclick="togglePassword('id_password', this)">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-signin">
+                    Sign In &nbsp;<i class="bi bi-arrow-right"></i>
+                </button>
+            </form>
+
+            <div class="footer-link">
+                Don't have an account? <a href="{% url 'signup' %}">Create one</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function togglePassword(fieldId, btn) {
+            const input = document.getElementById(fieldId);
+            const icon = btn.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'bi bi-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'bi bi-eye';
+            }
+        }
+    </script>
+</body>
+</html>
