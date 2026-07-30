@@ -1,0 +1,362 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --card-bg: #ffffff;
+    --card-border: rgba(0, 0, 0, 0.07);
+    --text-primary: #0f172a;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+
+    --primary-color: #111827;
+    --primary-glow: rgba(17, 24, 39, 0.1);
+    --secondary-color: #10b981;
+    --secondary-glow: rgba(16, 185, 129, 0.15);
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+    --info-color: #3b82f6;
+
+    --sidebar-width: 260px;
+    --transition-speed: 0.3s;
+
+    /* Pastel accents matching the reference design */
+    --pastel-blue: #bfdbfe;
+    --pastel-green: #bbf7d0;
+    --pastel-pink: #fce7f3;
+    --pastel-purple: #ede9fe;
+    --pastel-peach: #fed7aa;
+}
+
+/* =============== BASE =============== */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f0f4f8;
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6, .display-font {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* =============== CARDS =============== */
+.glass-card {
+    background: #ffffff;
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.04);
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+}
+
+.glass-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.glass-panel {
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid var(--card-border);
+    padding: 1.5rem;
+}
+
+/* =============== OVERRIDES – templates use text-white hardcoded =============== */
+/* Make text inside cards always dark so it's readable on white */
+.glass-card,
+.glass-card h1, .glass-card h2, .glass-card h3,
+.glass-card h4, .glass-card h5, .glass-card h6,
+.glass-card p, .glass-card span,
+.glass-panel,
+.glass-panel h1, .glass-panel h2, .glass-panel h3,
+.glass-panel h4, .glass-panel h5, .glass-panel h6 {
+    color: var(--text-primary);
+}
+
+/* The templates have text-white hardcoded on many elements – override them */
+.glass-card .text-white,
+.glass-panel .text-white,
+.glass-card.text-white,
+.glass-panel.text-white {
+    color: var(--text-primary) !important;
+}
+
+.glass-card .text-white-50,
+.glass-panel .text-white-50 {
+    color: var(--text-secondary) !important;
+}
+
+/* btn-close-white needs to be visible on white bg */
+.glass-card .btn-close-white,
+.glass-panel .btn-close-white,
+.modal-content .btn-close-white {
+    filter: invert(1);
+}
+
+/* Keep alert messages readable when their own bg gives enough contrast */
+.alert.text-white {
+    color: #ffffff !important;
+}
+
+/* =============== BUTTONS =============== */
+.btn-primary-custom {
+    background: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    color: #ffffff;
+    padding: 0.55rem 1.4rem;
+    border-radius: 10px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+.btn-primary-custom:hover {
+    background: #1e293b;
+    border-color: #1e293b;
+    color: #ffffff;
+    transform: scale(1.02);
+}
+
+.btn-secondary-custom {
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    color: var(--text-primary);
+    padding: 0.55rem 1.4rem;
+    border-radius: 10px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+.btn-secondary-custom:hover {
+    background: #f1f5f9;
+    transform: scale(1.02);
+}
+
+/* =============== SIDEBAR =============== */
+.sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    background: #ffffff;
+    border-right: 1px solid var(--card-border);
+    padding: 1.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    transition: all var(--transition-speed) ease;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.04);
+}
+
+.sidebar .nav-link {
+    color: var(--text-secondary);
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    margin-bottom: 0.25rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.sidebar .nav-link:hover:not(.active) {
+    color: var(--text-primary);
+    background: #f1f5f9;
+}
+
+.sidebar .nav-link.active {
+    color: #ffffff !important;
+    background: #111827;
+    box-shadow: 0 2px 8px rgba(17, 24, 39, 0.2);
+}
+
+.sidebar .nav-link i {
+    font-size: 1.1rem;
+}
+
+.sidebar .brand {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+}
+
+/* =============== MAIN CONTENT =============== */
+.main-content {
+    margin-left: var(--sidebar-width);
+    padding: 2rem;
+    min-height: 100vh;
+    transition: all var(--transition-speed) ease;
+}
+
+/* Small screen toggle button */
+.btn-outline-light {
+    color: var(--text-primary) !important;
+    border-color: rgba(0, 0, 0, 0.1) !important;
+    background: #ffffff !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* =============== STAT CARDS =============== */
+.stat-card {
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Pastel gradient backgrounds per card type, matching the reference image */
+.glass-card.stat-card {
+    background: linear-gradient(135deg, #f8fafc 0%, #f0f4f8 100%);
+}
+
+.glass-card.stat-card.stat-info {
+    background: linear-gradient(135deg, var(--pastel-blue) 0%, #ffffff 80%);
+}
+
+.glass-card.stat-card.stat-income {
+    background: linear-gradient(135deg, var(--pastel-green) 0%, #ffffff 80%);
+}
+
+.glass-card.stat-card.stat-danger {
+    background: linear-gradient(135deg, var(--pastel-pink) 0%, #ffffff 80%);
+}
+
+/* The 4th savings card – generic */
+.glass-card.stat-card:not(.stat-info):not(.stat-income):not(.stat-danger) {
+    background: linear-gradient(135deg, var(--pastel-purple) 0%, #ffffff 80%);
+}
+
+.stat-card .stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-primary);
+}
+
+.stat-card.stat-income .stat-icon { background: rgba(16,185,129,0.12); color: #059669; }
+.stat-card.stat-danger  .stat-icon { background: rgba(239,68,68,0.12);  color: #dc2626; }
+.stat-card.stat-info    .stat-icon { background: rgba(59,130,246,0.12); color: #2563eb; }
+
+/* =============== FORMS =============== */
+.form-control, .form-select {
+    background: #f8fafc;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    color: var(--text-primary);
+    border-radius: 10px;
+    padding: 0.65rem 1rem;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    background: #ffffff;
+    border-color: #111827;
+    box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.07);
+    color: var(--text-primary);
+}
+
+.form-control::placeholder {
+    color: var(--text-muted);
+}
+
+.form-control-color {
+    padding: 0.3rem 0.5rem;
+    height: 45px;
+    cursor: pointer;
+}
+
+/* =============== TABLES =============== */
+.table-custom { color: var(--text-primary); }
+
+.table-custom th {
+    font-family: 'Outfit', sans-serif;
+    color: var(--text-secondary);
+    border-bottom: 2px solid var(--card-border);
+    padding: 1rem;
+    font-weight: 500;
+}
+
+.table-custom td {
+    border-bottom: 1px solid var(--card-border);
+    padding: 1rem;
+    vertical-align: middle;
+    color: var(--text-primary);
+}
+
+.table-custom tr:hover { background: #f8fafc; }
+
+/* =============== BADGES =============== */
+.badge-custom {
+    padding: 0.4rem 0.8rem;
+    border-radius: 30px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* =============== PROGRESS BARS =============== */
+.progress-custom {
+    height: 10px;
+    background-color: #e2e8f0;
+    border-radius: 30px;
+    overflow: hidden;
+}
+
+.progress-bar-custom { border-radius: 30px; }
+
+/* =============== AUTH SCREENS =============== */
+.auth-wrapper {
+    min-height: 100vh;
+    display: flex;
+    background: #ffffff;
+}
+
+.auth-sidebar {
+    flex: 1;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 4rem;
+    border-right: 1px solid var(--card-border);
+}
+
+.auth-sidebar h1,
+.auth-sidebar p,
+.auth-sidebar .glass-panel {
+    color: #ffffff !important;
+}
+
+.auth-sidebar .text-white-50 {
+    color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.auth-form-container {
+    width: 480px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 4rem;
+    background: #ffffff;
+}
+
+/* =============== RESPONSIVE =============== */
+@media (max-width: 991px) {
+    .auth-sidebar { display: none; }
+    .auth-form-container { width: 100%; padding: 2rem; }
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.active { transform: translateX(0); }
+    .main-content { margin-left: 0; padding: 1.5rem; }
+}

@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block title %}Financial Reports | FinAI Tracker{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 mb-0">Financial Reports</h1>
+            <p class="text-secondary mb-0">Generate, filter, and export transaction records.</p>
+        </div>
+    </div>
+
+    <!-- Filters and Exports Options panel -->
+    <div class="glass-card p-4 mb-4">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label for="id_start_date" class="form-label text-secondary small">From Date</label>
+                <input type="date" name="start_date" id="id_start_date" class="form-control" value="{{ filter_start_date }}">
+            </div>
+            <div class="col-md-3">
+                <label for="id_end_date" class="form-label text-secondary small">To Date</label>
+                <input type="date" name="end_date" id="id_end_date" class="form-control" value="{{ filter_end_date }}">
+            </div>
+            <div class="col-md-3">
+                <label for="id_type" class="form-label text-secondary small">Transaction Type</label>
+                <select name="type" id="id_type" class="form-select">
+                    <option value="ALL" {% if filter_type == 'ALL' %}selected{% endif %}>All Transactions</option>
+                    <option value="INCOME" {% if filter_type == 'INCOME' %}selected{% endif %}>Incomes Only</option>
+                    <option value="EXPENSE" {% if filter_type == 'EXPENSE' %}selected{% endif %}>Expenses Only</option>
+                </select>
+            </div>
+            <div class="col-md-3 d-flex gap-2">
+                <button type="submit" class="btn btn-primary-custom w-100">
+                    <i class="bi bi-search"></i> Search
+                </button>
+                <a href="{% url 'report_page' %}" class="btn btn-outline-light w-100">
+                    Reset
+                </a>
+            </div>
+        </form>
+
+        <hr class="text-secondary opacity-25 my-4">
+
+        <!-- Export Buttons -->
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <span class="text-secondary small">Export matches as:</span>
+            <div class="d-flex gap-2">
+                <a href="{% url 'export_report' %}?format=csv&start_date={{ filter_start_date }}&end_date={{ filter_end_date }}&type={{ filter_type }}" class="btn btn-sm btn-outline-light d-flex align-items-center gap-2">
+                    <i class="bi bi-filetype-csv text-success"></i> Export CSV
+                </a>
+                <a href="{% url 'export_report' %}?format=excel&start_date={{ filter_start_date }}&end_date={{ filter_end_date }}&type={{ filter_type }}" class="btn btn-sm btn-outline-light d-flex align-items-center gap-2">
+                    <i class="bi bi-file-earmark-excel text-info"></i> Export Excel
+                </a>
+                <button onclick="window.print()" class="btn btn-sm btn-outline-light d-flex align-items-center gap-2">
+                    <i class="bi bi-printer"></i> Print Summary
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result Log -->
+    <div class="glass-card p-4">
+        {% if transactions %}
+            <div class="table-responsive">
+                <table class="table table-custom align-middle">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Date</th>
+                            <th>Category</th>
+                            <th>Amount</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tx in transactions %}
+                            <tr>
+                                <td>
+                                    {% if tx.type == 'Income' %}
+                                        <span class="badge-custom bg-success bg-opacity-25 text-success">
+                                            <i class="bi bi-plus-circle-fill"></i> Income
+                                        </span>
+                                    {% else %}
+                                        <span class="badge-custom bg-danger bg-opacity-25 text-danger">
+                                            <i class="bi bi-dash-circle-fill"></i> Expense
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="fw-semibold">{{ tx.date|date:"Y-m-d" }}</td>
+                                <td>
+                                    <span class="badge-custom bg-opacity-10 text-white" style="background-color: {{ tx.category_color }}33; border: 1px solid {{ tx.category_color }}">
+                                        <i class="bi {{ tx.category_icon }} me-1"></i> {{ tx.category }}
+                                    </span>
+                                </td>
+                                <td class="fw-bold {% if tx.type == 'Income' %}text-success{% else %}text-danger{% endif %}">
+                                    {% if tx.type == 'Income' %}+{% else %}-{% endif %}{{ request.user.currency }} {{ tx.amount }}
+                                </td>
+                                <td class="text-secondary small">{{ tx.description|default:"-" }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-5 text-secondary">
+                <i class="bi bi-clipboard-data fs-1 mb-2"></i>
+                <p>No transactions found matching filter parameters.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
