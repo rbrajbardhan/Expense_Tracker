@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block title %}My Profile | FinAI Tracker{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 mb-0">My Profile</h1>
+            <p class="text-secondary mb-0">Manage your account credentials, base settings, and target currencies.</p>
+        </div>
+        <a href="{% url 'password_change' %}" class="btn btn-outline-light btn-sm">
+            <i class="bi bi-key-fill me-1"></i> Change Password
+        </a>
+    </div>
+
+    <div class="row">
+        <!-- Profile summary card -->
+        <div class="col-lg-4 mb-4">
+            <div class="glass-card p-4 text-center">
+                <div class="avatar-container mb-3 d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-25 text-primary rounded-circle" style="width: 90px; height: 90px;">
+                    <i class="bi bi-person fs-1"></i>
+                </div>
+                <h3 class="h4 mb-1">{{ request.user.username|capfirst }}</h3>
+                <p class="text-secondary small mb-3">{{ request.user.email }}</p>
+                <div class="badge-custom bg-opacity-25 bg-primary text-primary mb-3">
+                    <i class="bi bi-currency-exchange"></i> Default Currency: {{ request.user.currency }}
+                </div>
+                
+                <hr class="my-4 text-secondary opacity-25">
+                
+                <div class="text-start">
+                    <p class="text-secondary small mb-1">Savings Goal Progress (Monthly Target)</p>
+                    <h5 class="fw-bold">{{ request.user.currency }} {{ request.user.monthly_savings_target }}</h5>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Profile form -->
+        <div class="col-lg-8">
+            <div class="glass-card p-4">
+                <h4 class="mb-4 text-white">Edit Profile Details</h4>
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_first_name" class="form-label text-secondary">First Name</label>
+                            {{ u_form.first_name }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_last_name" class="form-label text-secondary">Last Name</label>
+                            {{ u_form.last_name }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="id_email" class="form-label text-secondary">Email Address</label>
+                        {{ u_form.email }}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_currency" class="form-label text-secondary">Preferred Currency</label>
+                            {{ u_form.currency }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_monthly_savings_target" class="form-label text-secondary">Monthly Savings Target</label>
+                            {{ u_form.monthly_savings_target }}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_occupation" class="form-label text-secondary">Occupation</label>
+                            {{ p_form.occupation }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="id_phone_number" class="form-label text-secondary">Phone Number</label>
+                            {{ p_form.phone_number }}
+                        </div>
+                    </div>
+
+                    <div class="mt-4 text-end">
+                        <button type="submit" class="btn btn-primary-custom">
+                            <i class="bi bi-save me-1"></i> Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
