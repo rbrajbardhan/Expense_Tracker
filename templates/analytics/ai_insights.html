@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+{% block title %}AI Financial Insights | FinAI Tracker{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex align-items-center gap-3 mb-4">
+        <div class="stat-icon bg-primary bg-opacity-25 text-primary fs-3 rounded p-2 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+            <i class="bi bi-stars"></i>
+        </div>
+        <div>
+            <h1 class="h2 mb-0">AI Financial Insights</h1>
+            <p class="text-secondary mb-0">Scikit-learn statistical analysis and prediction engine for your finances.</p>
+        </div>
+    </div>
+
+    {% if not insights.has_enough_data %}
+        <div class="glass-card p-5 text-center text-secondary">
+            <i class="bi bi-robot fs-1 text-primary mb-3"></i>
+            <h3 class="text-white fw-bold mb-2">Insufficient Historical Transactions</h3>
+            <p class="max-width-600 mx-auto">{{ insights.recommendations.0 }}</p>
+        </div>
+    {% else %}
+        <!-- AI Results Layout Grid -->
+        <div class="row g-4 mb-4">
+            
+            <!-- Expense Forecasts -->
+            <div class="col-lg-6">
+                <div class="glass-card p-4 h-100">
+                    <h4 class="mb-4 text-white"><i class="bi bi-graph-up text-primary me-2"></i>Next Month Spend Forecast</h4>
+                    
+                    {% if insights.forecast %}
+                        <div class="glass-panel p-4 mb-4 text-center">
+                            <p class="text-secondary small mb-1">Projected Spending (Next Month)</p>
+                            <h2 class="display-5 fw-bold text-white mb-2">{{ request.user.currency }} {{ insights.forecast.total }}</h2>
+                            <span class="badge-custom bg-opacity-25 {% if insights.forecast.trend == 'rising' %}bg-danger text-danger{% else %}bg-success text-success{% endif %}">
+                                <i class="bi {% if insights.forecast.trend == 'rising' %}bi-arrow-up-right{% else %}bi-arrow-down-left{% endif %}"></i> Trend: {{ insights.forecast.trend|capfirst }}
+                            </span>
+                        </div>
+
+                        <h5 class="text-white mb-3">Predicted Category Spend</h5>
+                        {% if insights.forecast.categories %}
+                            <div class="row g-2">
+                                {% for cat, amount in insights.forecast.categories.items %}
+                                    <div class="col-12 d-flex justify-content-between text-white border-bottom border-secondary border-opacity-10 pb-2">
+                                        <span class="text-secondary">{{ cat }}</span>
+                                        <span class="fw-semibold">{{ request.user.currency }} {{ amount }}</span>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p class="text-secondary small">Insufficient category data to forecast individual groups.</p>
+                        {% endif %}
+                    {% else %}
+                        <p class="text-secondary">Unable to compute forecasts at this time.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Spending Velocity Budget Risks -->
+            <div class="col-lg-6">
+                <div class="glass-card p-4 h-100">
+                    <h4 class="mb-4 text-white"><i class="bi bi-exclamation-octagon text-warning me-2"></i>Spending Velocity warnings</h4>
+                    
+                    {% if insights.budget_risks %}
+                        <div class="d-flex flex-column gap-3">
+                            {% for risk in insights.budget_risks %}
+                                <div class="glass-panel p-3 border-left border-warning text-white">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h5 class="mb-0 fw-bold">{{ risk.category }}</h5>
+                                        <span class="badge bg-danger text-white">{{ risk.risk_level }} Risk</span>
+                                    </div>
+                                    <p class="small text-secondary mb-3">{{ risk.message }}</p>
+                                    
+                                    <div class="row g-2 text-center small text-white-50">
+                                        <div class="col-4 border-right border-secondary border-opacity-10">
+                                            <p class="mb-0 text-muted">Limit</p>
+                                            <p class="mb-0 fw-bold">{{ request.user.currency }} {{ risk.budget_amount }}</p>
+                                        </div>
+                                        <div class="col-4 border-right border-secondary border-opacity-10">
+                                            <p class="mb-0 text-muted">Actual</p>
+                                            <p class="mb-0 fw-bold">{{ request.user.currency }} {{ risk.current_spending }}</p>
+                                        </div>
+                                        <div class="col-4">
+                                            <p class="mb-0 text-muted">Projected</p>
+                                            <p class="mb-0 fw-bold text-warning">{{ request.user.currency }} {{ risk.projected_spending }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5 text-secondary">
+                            <i class="bi bi-shield-check fs-1 text-success mb-2"></i>
+                            <p class="mb-0">All category spending velocities are healthy. You are not projected to exceed any budgets.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Spending Anomalies -->
+            <div class="col-lg-6">
+                <div class="glass-card p-4 h-100">
+                    <h4 class="mb-4 text-white"><i class="bi bi-shield-fill-exclamation text-danger me-2"></i>Anomaly Detection (Z-Score > 2)</h4>
+                    
+                    {% if insights.anomalies %}
+                        <div class="table-responsive">
+                            <table class="table table-custom align-middle">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Category</th>
+                                        <th>Amount</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for anomaly in insights.anomalies %}
+                                        <tr>
+                                            <td class="small">{{ anomaly.date }}</td>
+                                            <td>
+                                                <span class="badge-custom bg-opacity-10 text-white" style="border: 1px solid #ef4444; background: rgba(239, 68, 68, 0.1)">
+                                                    {{ anomaly.category }}
+                                                </span>
+                                            </td>
+                                            <td class="fw-bold text-danger">{{ request.user.currency }} {{ anomaly.amount }}</td>
+                                            <td class="text-secondary small">{{ anomaly.description }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5 text-secondary">
+                            <i class="bi bi-bookmark-check fs-1 text-success mb-2"></i>
+                            <p class="mb-0">No transaction outliers detected. All purchase sizes look consistent.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Smart Cost Savings Recommendations -->
+            <div class="col-lg-6">
+                <div class="glass-card p-4 h-100">
+                    <h4 class="mb-4 text-white"><i class="bi bi-lightbulb text-info me-2"></i>AI Recommendations & Advisory</h4>
+                    
+                    <div class="d-flex flex-column gap-3">
+                        {% for rec in insights.recommendations %}
+                            <div class="glass-panel p-3 border-left border-info text-white d-flex align-items-start gap-3">
+                                <i class="bi bi-info-circle-fill text-info fs-4"></i>
+                                <p class="mb-0 small text-secondary" style="line-height: 1.5;">{{ rec|safe }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

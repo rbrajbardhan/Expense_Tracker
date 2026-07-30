@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% block title %}Analytics | FinAI Tracker{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="mb-4">
+        <h1 class="h2 mb-0">Financial Analytics</h1>
+        <p class="text-secondary">Interactive visualizations showing cash flow trends, budget metrics, and categories.</p>
+    </div>
+
+    <!-- Charts Layout Grid -->
+    <div class="row g-4 mb-4">
+        <!-- Cash Flow Line Chart -->
+        <div class="col-lg-8">
+            <div class="glass-card p-4 h-100">
+                <h4 class="mb-4 text-white">Monthly Cash Flow Trend (Past 6 Months)</h4>
+                <div style="height: 350px; position: relative;">
+                    <canvas id="analyticsFlowChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Expense Category Breakdown Doughnut -->
+        <div class="col-lg-4">
+            <div class="glass-card p-4 h-100">
+                <h4 class="mb-4 text-white">Expense Categories (Current Month)</h4>
+                <div style="height: 350px; position: relative;">
+                    <canvas id="analyticsCategoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Budget vs Actual Bar Chart -->
+        <div class="col-12">
+            <div class="glass-card p-4">
+                <h4 class="mb-4 text-white">Budgets Set vs Actual Spending Comparison</h4>
+                <div style="height: 350px; position: relative;">
+                    <canvas id="analyticsBudgetChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        fetch("{% url 'chart_data_api' %}")
+            .then(response => response.json())
+            .then(data => {
+                // 1. Cash Flow Line Chart
+                const ctxFlow = document.getElementById('analyticsFlowChart').getContext('2d');
+                new Chart(ctxFlow, {
+                    type: 'line',
+                    data: {
+                        labels: data.trends.labels,
+                        datasets: [
+                            {
+                                label: 'Total Income',
+                                data: data.trends.income,
+                                borderColor: '#10b981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                fill: true,
+                                tension: 0.3
+                            },
+                            {
+                                label: 'Total Expense',
+                                data: data.trends.expense,
+                                borderColor: '#ef4444',
+                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                fill: true,
+                                tension: 0.3
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { color: '#475569' } }
+                        },
+                        scales: {
+                            x: {
+                                grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                                ticks: { color: '#475569' }
+                            },
+                            y: {
+                                grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                                ticks: { color: '#475569' }
+                            }
+                        }
+                    }
+                });
+
+                // 2. Category Doughnut Chart
+                const ctxCat = document.getElementById('analyticsCategoryChart').getContext('2d');
+                if (data.categories.data.length > 0) {
+                    new Chart(ctxCat, {
+                        type: 'doughnut',
+                        data: {
+                            labels: data.categories.labels,
+                            datasets: [{
+                                data: data.categories.data,
+                                backgroundColor: data.categories.colors,
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: { color: '#475569', boxWidth: 12 }
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    document.getElementById('analyticsCategoryChart').parentElement.innerHTML = `
+                        <div class="d-flex align-items-center justify-content-center h-100 text-secondary">
+                            <p class="mb-0">No transaction data this month</p>
+                        </div>
+                    `;
+                }
+
+                // 3. Budgets vs Actuals Bar Chart
+                const ctxBgt = document.getElementById('analyticsBudgetChart').getContext('2d');
+                if (data.budgets.labels.length > 0) {
+                    new Chart(ctxBgt, {
+                        type: 'bar',
+                        data: {
+                            labels: data.budgets.labels,
+                            datasets: [
+                                {
+                                    label: 'Budget Limit',
+                                    data: data.budgets.limits,
+                                    backgroundColor: 'rgba(15, 23, 42, 0.08)',
+                                    borderColor: '#0f172a',
+                                    borderWidth: 1
+                                },
+                                {
+                                    label: 'Actual Spent',
+                                    data: data.budgets.actuals,
+                                    backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                                    borderColor: '#ef4444',
+                                    borderWidth: 1
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { labels: { color: '#475569' } }
+                            },
+                            scales: {
+                                x: {
+                                    grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                                    ticks: { color: '#475569' }
+                                },
+                                y: {
+                                    grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                                    ticks: { color: '#475569' }
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    document.getElementById('analyticsBudgetChart').parentElement.innerHTML = `
+                        <div class="d-flex align-items-center justify-content-center h-100 text-secondary py-5">
+                            <p class="mb-0">No active budgets. Add category limits to activate this chart.</p>
+                        </div>
+                    `;
+                }
+            });
+    });
+</script>
+{% endblock %}
