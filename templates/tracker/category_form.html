@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Edit Category | FinAI Tracker{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4" style="max-width: 600px; margin: 0 auto;">
+    <div class="mb-4">
+        <h1 class="h2 mb-0">Edit Category</h1>
+        <p class="text-secondary">Update your category details below.</p>
+    </div>
+
+    <div class="glass-card p-4">
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="id_name" class="form-label text-secondary">Name</label>
+                {{ form.name }}
+            </div>
+            <div class="mb-3">
+                <label for="id_type" class="form-label text-secondary">Type</label>
+                {{ form.type }}
+            </div>
+            <div class="mb-3">
+                <label for="id_icon" class="form-label text-secondary">Bootstrap Icon Class</label>
+                {{ form.icon }}
+            </div>
+            <div class="mb-4">
+                <label for="id_color" class="form-label text-secondary">Category Accent Color</label>
+                {{ form.color }}
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{% url 'category_list' %}" class="btn btn-outline-light">
+                    Cancel
+                </a>
+                <button type="submit" class="btn btn-primary-custom">
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+{% block title %}Savings Goals | FinAI Tracker{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 mb-0">Savings Goals</h1>
+            <p class="text-secondary mb-0">Define and monitor your financial targets.</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Add Savings Goal Form -->
+        <div class="col-lg-4">
+            <div class="glass-card p-4">
+                <h4 class="mb-3 text-white">New Savings Goal</h4>
+                <form action="{% url 'savings_add' %}" method="post">
+                    {% csrf_token %}
+                    {% if form.errors %}
+                        <div class="alert alert-danger border-0 glass-card text-white mb-3">
+                            <ul class="mb-0">
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <label for="id_name" class="form-label text-secondary">Goal Name</label>
+                        {{ form.name }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_target_amount" class="form-label text-secondary">Target Amount ({{ request.user.currency }})</label>
+                        {{ form.target_amount }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_current_amount" class="form-label text-secondary">Starting Saved Amount ({{ request.user.currency }})</label>
+                        {{ form.current_amount }}
+                    </div>
+                    <div class="mb-4">
+                        <label for="id_target_date" class="form-label text-secondary">Target Date</label>
+                        {{ form.target_date }}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary-custom w-100">
+                        <i class="bi bi-plus-lg me-1"></i> Add Goal
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Goals Grid -->
+        <div class="col-lg-8">
+            <div class="glass-card p-4">
+                <h4 class="mb-4 text-white">Active Savings Targets</h4>
+                {% if savings_goals %}
+                    <div class="row g-3">
+                        {% for goal in savings_goals %}
+                            <div class="col-md-6">
+                                <div class="glass-panel p-3 text-white position-relative">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                            <h5 class="fw-bold mb-1">{{ goal.name }}</h5>
+                                            <span class="text-secondary small"><i class="bi bi-calendar-event me-1"></i> Target: {{ goal.target_date|date:"Y-m-d" }}</span>
+                                        </div>
+                                        <div class="d-flex gap-2">
+                                            <a href="{% url 'savings_edit' goal.pk %}" class="btn btn-sm btn-outline-light" title="Edit">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a href="{% url 'savings_delete' goal.pk %}" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between mb-1 small text-secondary">
+                                        <span>Saved: <strong>{{ request.user.currency }} {{ goal.current_amount }}</strong></span>
+                                        <span>Target: <strong>{{ request.user.currency }} {{ goal.target_amount }}</strong></span>
+                                    </div>
+
+                                    <div class="progress progress-custom mb-3">
+                                        <div class="progress-bar progress-bar-custom bg-primary" role="progressbar" style="width: {{ goal.percentage_reached }}%" aria-valuenow="{{ goal.percentage_reached }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+
+                                    <!-- Quick Contribution Form -->
+                                    <form action="{% url 'savings_contribute' goal.pk %}" method="post" class="row g-2 align-items-center mt-2">
+                                        {% csrf_token %}
+                                        <div class="col-8">
+                                            <input type="number" step="0.01" min="0.01" name="amount" class="form-control form-control-sm" placeholder="Contribute amount..." required>
+                                        </div>
+                                        <div class="col-4">
+                                            <button type="submit" class="btn btn-sm btn-secondary-custom w-100">Add</button>
+                                        </div>
+                                    </form>
+
+                                    <!-- Goal Complete Watermark -->
+                                    {% if goal.is_completed %}
+                                        <span class="badge-custom bg-success bg-opacity-25 text-success position-absolute top-0 end-0 m-3" style="transform: rotate(5deg);">
+                                            <i class="bi bi-check-circle-fill"></i> Completed
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-secondary text-center py-5">No savings goals. Set one to start allocating savings.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

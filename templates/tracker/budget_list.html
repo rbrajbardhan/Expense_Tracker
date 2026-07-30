@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block title %}Manage Budgets | FinAI Tracker{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h2 mb-0">Budgets</h1>
+            <p class="text-secondary mb-0">Monitor and restrict monthly spending by category.</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Add Budget -->
+        <div class="col-lg-4">
+            <div class="glass-card p-4">
+                <h4 class="mb-3 text-white">Create Budget</h4>
+                <form action="{% url 'budget_add' %}" method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="id_category" class="form-label text-secondary">Expense Category</label>
+                        {{ form.category }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_amount" class="form-label text-secondary">Budget Limit ({{ request.user.currency }})</label>
+                        {{ form.amount }}
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_start_date" class="form-label text-secondary">Start Date</label>
+                        {{ form.start_date }}
+                    </div>
+                    <div class="mb-4">
+                        <label for="id_end_date" class="form-label text-secondary">End Date</label>
+                        {{ form.end_date }}
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary-custom w-100">
+                        <i class="bi bi-plus-lg me-1"></i> Add Budget
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Budgets List -->
+        <div class="col-lg-8">
+            <div class="glass-card p-4">
+                <h4 class="mb-3 text-white">Active & Past Budgets</h4>
+                {% if budgets %}
+                    <div class="row g-3">
+                        {% for budget in budgets %}
+                            <div class="col-12">
+                                <div class="glass-panel p-3 text-white">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="badge-custom bg-opacity-10 text-white" style="background-color: {{ budget.category.color }}33; border: 1px solid {{ budget.category.color }}">
+                                                <i class="bi {{ budget.category.icon }} me-1"></i> {{ budget.category.name }}
+                                            </span>
+                                            <span class="text-secondary small">{{ budget.start_date|date:"Y-m-d" }} to {{ budget.end_date|date:"Y-m-d" }}</span>
+                                        </div>
+                                        <div class="d-flex gap-2">
+                                            <a href="{% url 'budget_edit' budget.pk %}" class="btn btn-sm btn-outline-light" title="Edit">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a href="{% url 'budget_delete' budget.pk %}" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="d-flex justify-content-between mb-1 small text-secondary">
+                                        <span>Spent: <strong>{{ request.user.currency }} {{ budget.current_spending }}</strong></span>
+                                        <span>Limit: <strong>{{ request.user.currency }} {{ budget.amount }}</strong></span>
+                                    </div>
+
+                                    <div class="progress progress-custom mb-1">
+                                        <div class="progress-bar progress-bar-custom {% if budget.percentage_spent > 90 %}bg-danger{% elif budget.percentage_spent > 75 %}bg-warning{% else %}bg-success{% endif %}" role="progressbar" style="width: {{ budget.percentage_spent }}%" aria-valuenow="{{ budget.percentage_spent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between small text-white-50">
+                                        <span>Usage: {{ budget.percentage_spent }}%</span>
+                                        <span>
+                                            {% if budget.current_spending > budget.amount %}
+                                                <span class="text-danger"><i class="bi bi-exclamation-circle-fill"></i> Exceeded by {{ request.user.currency }} {{ budget.amount_exceeded }}</span>
+                                            {% else %}
+                                                <span class="text-success"><i class="bi bi-check-circle-fill"></i> Under Budget</span>
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-secondary text-center py-5">No budgets set. Create a budget to monitor costs.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
