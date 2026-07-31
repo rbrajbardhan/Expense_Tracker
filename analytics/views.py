@@ -61,17 +61,34 @@ class ChartDataAPIView(LoginRequiredMixin, View):
             category_colors.append(item['category__color'] or '#6f42c1')
 
         # 3. Budget vs Actual comparison
-        active_budgets = Budget.objects.filter(
-            user=user, start_date__lte=today, end_date__gte=today
+        raw_start = request.GET.get('start_date')
+        raw_end   = request.GET.get('end_date')
+        if raw_start and raw_end:
+            range_start = datetime.date.fromisoformat(raw_start)
+            range_end   = datetime.date.fromisoformat(raw_end)
+        else:
+            range_start = today.replace(day=1)
+            range_end   = today.replace(day=__import__('calendar').monthrange(today.year, today.month)[1])
+
+        overlapping_budgets = Budget.objects.filter(
+            user=user,
+            start_date__lte=range_end,
+            end_date__gte=range_start,
         )
         budget_categories = []
         budget_limits = []
         budget_actuals = []
-        
-        for b in active_budgets:
+
+        for b in overlapping_budgets:
+            actual = Expense.objects.filter(
+                user=user,
+                category=b.category,
+                date__range=(b.start_date, b.end_date),
+            ).aggregate(total=Sum('amount'))['total'] or 0
+
             budget_categories.append(b.category.name)
             budget_limits.append(float(b.amount))
-            budget_actuals.append(float(b.current_spending))
+            budget_actuals.append(float(actual))
 
         data = {
             'trends': {
